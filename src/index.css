@@ -1,0 +1,228 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    background-color: #070d0a;
+    color: #d4c5a0;
+    font-family: 'Share Tech Mono', monospace;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #0a1a0f;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #c9a227;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #e8c547;
+  }
+}
+
+@layer components {
+  .vault-panel {
+    @apply bg-vault-panel border border-vault-border rounded-lg;
+  }
+
+  .vault-btn {
+    @apply bg-vault-gold text-vault-bg font-bold px-4 py-2 rounded cursor-pointer
+           hover:bg-vault-gold-light transition-all duration-200
+           active:scale-95 font-vault;
+  }
+
+  .vault-btn-outline {
+    @apply border border-vault-gold text-vault-gold px-4 py-2 rounded cursor-pointer
+           hover:bg-vault-gold hover:text-vault-bg transition-all duration-200
+           active:scale-95 font-vault;
+  }
+
+  .vault-btn-danger {
+    @apply bg-vault-red-light text-white px-4 py-2 rounded cursor-pointer
+           hover:opacity-80 transition-all duration-200
+           active:scale-95 font-vault;
+  }
+
+  .vault-input {
+    @apply bg-vault-dark border border-vault-border text-vault-gold-light
+           rounded px-3 py-2 w-full font-vault
+           focus:outline-none focus:border-vault-gold focus:shadow-gold
+           placeholder:text-vault-stone-light;
+  }
+
+  .vault-select {
+    @apply bg-vault-dark border border-vault-border text-vault-gold-light
+           rounded px-3 py-2 w-full font-vault
+           focus:outline-none focus:border-vault-gold cursor-pointer;
+  }
+
+  .vault-label {
+    @apply text-vault-stone-light text-xs uppercase tracking-widest mb-1 block;
+  }
+
+  .gold-text {
+    @apply text-vault-gold animate-glow;
+  }
+
+  .income-row {
+    @apply border-l-2 border-vault-green-light;
+  }
+
+  .expense-row {
+    @apply border-l-2 border-vault-red-light;
+  }
+
+  .vault-door-card {
+    @apply vault-panel p-6 cursor-pointer transition-all duration-300
+           hover:border-vault-gold hover:shadow-gold hover:scale-105
+           flex flex-col items-center justify-center gap-3;
+  }
+
+  .vault-door-card.active {
+    @apply border-vault-gold shadow-gold-lg;
+  }
+
+  .stat-card {
+    @apply vault-panel p-4 flex flex-col gap-1;
+  }
+
+  .progress-bar-track {
+    @apply bg-vault-dark rounded-full overflow-hidden;
+    height: 12px;
+  }
+
+  .progress-bar-fill {
+    @apply h-full rounded-full transition-all duration-1000;
+    background: linear-gradient(90deg, #a07c10, #c9a227, #e8c547);
+  }
+}
+
+/* Vault door animation overlay */
+.vault-transition-enter {
+  animation: vaultEnter 0.5s ease-out forwards;
+}
+
+@keyframes vaultEnter {
+  0% {
+    clip-path: inset(0 100% 0 0);
+    opacity: 0;
+  }
+  100% {
+    clip-path: inset(0 0% 0 0);
+    opacity: 1;
+  }
+}
+
+/* Spinning vault gear decoration */
+.vault-gear {
+  animation: spin 20s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Confetti particle */
+.confetti-particle {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  animation: confettiFall 1.5s ease-in forwards;
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(120px) rotate(720deg); opacity: 0; }
+}
+
+/* Toast notification */
+.toast-enter {
+  animation: slideIn 0.3s ease-out;
+}
+
+.toast-exit {
+  animation: slideOut 0.3s ease-in forwards;
+}
+
+@keyframes slideOut {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(100%); opacity: 0; }
+}
+
+/* Neon glow for balance */
+.neon-gold {
+  color: #c9a227;
+  text-shadow: 0 0 10px rgba(201, 162, 39, 0.8), 0 0 20px rgba(201, 162, 39, 0.5);
+}
+
+.neon-green {
+  color: #22c55e;
+  text-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+}
+
+.neon-red {
+  color: #ef4444;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+/* Calendar day pulse */
+.calendar-day-has-payment::after {
+  content: '';
+  position: absolute;
+  bottom: 3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: #c9a227;
+  border-radius: 50%;
+  animation: pulseGold 2s ease-in-out infinite;
+}
+
+@keyframes pulseGold {
+  0%, 100% { box-shadow: 0 0 3px rgba(201,162,39,0.5); opacity: 0.8; }
+  50% { box-shadow: 0 0 8px rgba(201,162,39,1); opacity: 1; }
+}
+
+/* Modal backdrop */
+.modal-backdrop {
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+}
+
+/* Stone texture background for vault walls */
+.vault-wall {
+  background-image:
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 30px,
+      rgba(26, 61, 34, 0.15) 30px,
+      rgba(26, 61, 34, 0.15) 31px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 30px,
+      rgba(26, 61, 34, 0.15) 30px,
+      rgba(26, 61, 34, 0.15) 31px
+    );
+}
