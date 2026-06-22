@@ -1,0 +1,1202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Vault — Your Financial Fortress</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Cinzel:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base Styles */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #070d0a;
+            color: #d4c5a0;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Colors */
+        :root {
+            --bg-dark: #0a1a0f;
+            --panel: #0f2318;
+            --border: #1a3d22;
+            --gold: #c9a227;
+            --gold-light: #e8c547;
+            --green: #22c55e;
+            --red: #ef4444;
+            --stone: #6b7280;
+        }
+
+        /* Components */
+        .vault-panel {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .vault-btn {
+            background: var(--gold);
+            color: #070d0a;
+            font-weight: bold;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.2s;
+        }
+
+        .vault-btn:hover { background: var(--gold-light); }
+        .vault-btn:active { transform: scale(0.95); }
+
+        .vault-btn-outline {
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            background: transparent;
+            font-family: 'Share Tech Mono', monospace;
+            transition: all 0.2s;
+        }
+
+        .vault-btn-outline:hover { background: var(--gold); color: #070d0a; }
+
+        .vault-btn-danger {
+            background: var(--red);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .vault-input, .vault-select {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            color: var(--gold-light);
+            padding: 8px 12px;
+            border-radius: 4px;
+            width: 100%;
+            font-family: 'Share Tech Mono', monospace;
+            outline: none;
+        }
+
+        .vault-input:focus, .vault-select:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 15px rgba(201, 162, 39, 0.4);
+        }
+
+        .vault-label {
+            color: var(--stone);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .gold-text { color: var(--gold); }
+        .font-vault { font-family: 'Share Tech Mono', monospace; }
+        .font-display { font-family: 'Cinzel', serif; }
+
+        /* HUD */
+        .hud {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 40;
+            height: 56px;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 56px;
+            left: 0;
+            right: 0;
+            z-index: 30;
+            background: var(--bg-dark);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            overflow-x: auto;
+        }
+
+        .nav-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 24px;
+            font-family: 'Share Tech Mono', monospace;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.2s;
+            background: none;
+            border: none;
+            color: var(--stone);
+            cursor: pointer;
+        }
+
+        .nav-btn:hover { color: var(--gold); background: rgba(15, 35, 24, 0.5); }
+        .nav-btn.active { color: var(--gold); border-bottom: 2px solid var(--gold); background: var(--panel); }
+
+        /* Main Content */
+        .main-content {
+            padding-top: 112px;
+            padding-bottom: 32px;
+            padding-left: 16px;
+            padding-right: 16px;
+            max-width: 1280px;
+            margin: 0 auto;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        /* Progress Bar */
+        .progress-track {
+            background: var(--bg-dark);
+            border-radius: 999px;
+            overflow: hidden;
+            height: 12px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 999px;
+            transition: width 1s ease-out;
+            background: linear-gradient(90deg, #a07c10, #c9a227, #e8c547);
+        }
+
+        /* Calendar */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            padding: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            background: transparent;
+            border: none;
+            color: var(--gold-light);
+            font-family: 'Share Tech Mono', monospace;
+        }
+
+        .calendar-day:hover { background: var(--bg-dark); }
+        .calendar-day.selected { background: var(--gold); color: var(--bg-dark); }
+        .calendar-day.today { border: 1px solid var(--gold); }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 50;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-content {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 24px;
+            max-width: 480px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Toast */
+        .toast-container {
+            position: fixed;
+            top: 72px;
+            right: 16px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-width: 400px;
+        }
+
+        .toast {
+            display: flex;
+            align-items: start;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            background: var(--bg-dark);
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        .toast-success { border-color: var(--green); }
+        .toast-warning { border-color: #f59e0b; }
+        .toast-danger { border-color: var(--red); }
+
+        /* Grid helpers */
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 24px; }
+        .flex-between { display: flex; justify-content: space-between; align-items: center; }
+        .gap-4 { gap: 16px; }
+        .mb-4 { margin-bottom: 16px; }
+        .mb-2 { margin-bottom: 8px; }
+        .mt-2 { margin-top: 8px; }
+        .space-y-3 > * + * { margin-top: 12px; }
+        .text-sm { font-size: 14px; }
+        .text-xs { font-size: 12px; }
+        .text-center { text-align: center; }
+        .w-full { width: 100%; }
+    </style>
+</head>
+<body>
+    <!-- HUD -->
+    <header class="hud">
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 24px;">🏛️</span>
+            <span class="font-display gold-text" style="font-size: 18px; font-weight: bold;">BUDGET VAULT</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="color: var(--stone); font-size: 12px;">Balance:</span>
+            <span id="hud-balance" class="font-vault gold-text" style="font-size: 20px; font-weight: bold;">$0.00</span>
+        </div>
+    </header>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <button class="nav-btn active" onclick="switchVault('dashboard')">🏛️ Main Vault</button>
+        <button class="nav-btn" onclick="switchVault('calendar')">📅 Payment Vault</button>
+        <button class="nav-btn" onclick="switchVault('ledger')">📊 Ledger Vault</button>
+        <button class="nav-btn" onclick="switchVault('savings')">💰 Savings Vault</button>
+    </nav>
+
+    <!-- Toast Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Main Content -->
+    <main id="main-content" class="main-content">
+        <!-- Vault sections will be rendered here -->
+    </main>
+
+    <script>
+        // ==================== STATE MANAGEMENT ====================
+        const STORAGE_KEY = 'budgetVaultState';
+
+        const defaultState = {
+            transactions: [
+                { id: '1', type: 'income', amount: 3200, category: 'Salary', description: 'Monthly paycheck', date: '2026-06-01' },
+                { id: '2', type: 'expense', amount: 850, category: 'Rent', description: 'Monthly rent', date: '2026-06-02' },
+                { id: '3', type: 'expense', amount: 120, category: 'Groceries', description: 'Weekly groceries', date: '2026-06-05' },
+            ],
+            payments: [
+                { id: 'p1', title: 'Rent', amount: 850, dueDay: 1, recurring: true, nextDue: '2026-07-01', reminderDays: 5, paid: false, category: 'Housing' },
+                { id: 'p2', title: 'Netflix', amount: 15.99, dueDay: 15, recurring: true, nextDue: '2026-06-15', reminderDays: 2, paid: false, category: 'Entertainment' },
+                { id: 'p3', title: 'Car Insurance', amount: 120, dueDay: 20, recurring: true, nextDue: '2026-06-20', reminderDays: 3, paid: false, category: 'Insurance' },
+            ],
+            goals: [
+                { id: 'g1', name: 'Emergency Fund', targetAmount: 5000, savedAmount: 1250, icon: '🏦', color: '#c9a227' },
+                { id: 'g2', name: 'Vacation', targetAmount: 2000, savedAmount: 600, icon: '✈️', color: '#22c55e' },
+            ],
+            monthlyBudgetLimit: 2000,
+        };
+
+        function loadState() {
+            try {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                return stored ? JSON.parse(stored) : defaultState;
+            } catch (e) {
+                return defaultState;
+            }
+        }
+
+        function saveState(state) {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+            } catch (e) {
+                console.error('Failed to save state:', e);
+            }
+        }
+
+        let appState = loadState();
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).slice(2);
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-US', {
+                style: 'currency',
+                currency: 'USD',
+            }).format(amount);
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        }
+
+        function todayISO() {
+            const d = new Date();
+            return d.toISOString().split('T')[0];
+        }
+
+        function getDaysInMonth(year, month) {
+            return new Date(year, month + 1, 0).getDate();
+        }
+
+        function getFirstDayOfMonth(year, month) {
+            return new Date(year, month, 1).getDay();
+        }
+
+        function showToast(message, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.innerHTML = `<span class="font-vault text-sm">${message}</span>`;
+            container.appendChild(toast);
+            setTimeout(() => toast.remove(), 5000);
+        }
+
+        function updateHUD() {
+            const balance = appState.transactions.reduce((sum, t) => {
+                return t.type === 'income' ? sum + Number(t.amount) : sum - Number(t.amount);
+            }, 0);
+            document.getElementById('hud-balance').textContent = formatCurrency(balance);
+        }
+
+        // ==================== VAULT SWITCHING ====================
+        let currentVault = 'dashboard';
+
+        function switchVault(vaultId) {
+            currentVault = vaultId;
+            
+            // Update nav buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.closest('.nav-btn').classList.add('active');
+            
+            // Render vault
+            renderVault(vaultId);
+        }
+
+        function renderVault(vaultId) {
+            const main = document.getElementById('main-content');
+            
+            switch (vaultId) {
+                case 'dashboard':
+                    main.innerHTML = renderDashboard();
+                    break;
+                case 'calendar':
+                    main.innerHTML = renderCalendar();
+                    initCalendar();
+                    break;
+                case 'ledger':
+                    main.innerHTML = renderLedger();
+                    break;
+                case 'savings':
+                    main.innerHTML = renderSavings();
+                    break;
+            }
+        }
+
+        // ==================== DASHBOARD ====================
+        function renderDashboard() {
+            const totalIncome = appState.transactions
+                .filter(t => t.type === 'income')
+                .reduce((sum, t) => sum + Number(t.amount), 0);
+            
+            const totalExpenses = appState.transactions
+                .filter(t => t.type === 'expense')
+                .reduce((sum, t) => sum + Number(t.amount), 0);
+            
+            const balance = totalIncome - totalExpenses;
+            const budgetUsed = (totalExpenses / appState.monthlyBudgetLimit) * 100;
+            
+            const totalSaved = appState.goals.reduce((sum, g) => sum + Number(g.savedAmount), 0);
+            
+            const upcomingPayments = appState.payments
+                .filter(p => !p.paid)
+                .sort((a, b) => new Date(a.nextDue) - new Date(b.nextDue))
+                .slice(0, 5);
+
+            return `
+                <div>
+                    <div class="text-center mb-4" style="margin-bottom: 32px;">
+                        <h1 class="font-display gold-text" style="font-size: 36px; font-weight: bold; margin-bottom: 8px;">MAIN VAULT</h1>
+                        <p class="font-vault" style="color: var(--stone);">Your Financial Fortress Overview</p>
+                    </div>
+
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Total Income</div>
+                            <div class="font-vault gold-text" style="font-size: 24px; font-weight: bold;">${formatCurrency(totalIncome)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Total Expenses</div>
+                            <div class="font-vault" style="font-size: 24px; font-weight: bold; color: var(--red);">${formatCurrency(totalExpenses)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Balance</div>
+                            <div class="font-vault gold-text" style="font-size: 24px; font-weight: bold;">${formatCurrency(balance)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Total Saved</div>
+                            <div class="font-vault" style="font-size: 24px; font-weight: bold; color: #60a5fa;">${formatCurrency(totalSaved)}</div>
+                        </div>
+                    </div>
+
+                    <div class="vault-panel">
+                        <div class="flex-between mb-4">
+                            <h2 class="font-display gold-text" style="font-size: 18px; font-weight: bold;">Monthly Budget</h2>
+                            <span class="font-vault text-sm" style="color: var(--stone);">${formatCurrency(totalExpenses)} / ${formatCurrency(appState.monthlyBudgetLimit)}</span>
+                        </div>
+                        <div class="progress-track">
+                            <div class="progress-fill" style="width: ${Math.min(budgetUsed, 100)}%; background: ${budgetUsed > 90 ? 'var(--red)' : budgetUsed > 70 ? '#f59e0b' : 'var(--gold)'};"></div>
+                        </div>
+                        <div style="text-align: right; margin-top: 8px;">
+                            <span class="font-vault text-sm">${budgetUsed.toFixed(1)}% used</span>
+                        </div>
+                    </div>
+
+                    <div class="grid-2">
+                        <div class="vault-panel">
+                            <h2 class="font-display gold-text mb-4" style="font-size: 18px; font-weight: bold;">📅 Upcoming Payments</h2>
+                            ${upcomingPayments.length === 0 ? '<p class="text-sm" style="color: var(--stone);">No upcoming payments</p>' :
+                                `<div class="space-y-3">
+                                    ${upcomingPayments.map(p => `
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 4px;">
+                                            <div>
+                                                <div class="font-vault text-sm gold-text">${p.title}</div>
+                                                <div class="text-xs" style="color: var(--stone);">${formatDate(p.nextDue)}</div>
+                                            </div>
+                                            <div class="font-vault gold-text" style="font-weight: bold;">${formatCurrency(Number(p.amount))}</div>
+                                        </div>
+                                    `).join('')}
+                                </div>`
+                            }
+                        </div>
+
+                        <div class="vault-panel">
+                            <h2 class="font-display gold-text mb-4" style="font-size: 18px; font-weight: bold;">📊 Recent Transactions</h2>
+                            ${appState.transactions.length === 0 ? '<p class="text-sm" style="color: var(--stone);">No transactions yet</p>' :
+                                `<div class="space-y-3">
+                                    ${appState.transactions.slice(0, 5).map(t => `
+                                        <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 4px; border-left: 3px solid ${t.type === 'income' ? 'var(--green)' : 'var(--red)'};">
+                                            <div>
+                                                <div class="font-vault text-sm gold-text">${t.description}</div>
+                                                <div class="text-xs" style="color: var(--stone);">${t.category}</div>
+                                            </div>
+                                            <div class="font-vault" style="font-weight: bold; color: ${t.type === 'income' ? 'var(--green)' : 'var(--red)'};">
+                                                ${t.type === 'income' ? '+' : '-'}${formatCurrency(Number(t.amount))}
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // ==================== CALENDAR ====================
+        let calendarDate = new Date();
+
+        function renderCalendar() {
+            const year = calendarDate.getFullYear();
+            const month = calendarDate.getMonth();
+            const daysInMonth = getDaysInMonth(year, month);
+            const firstDay = getFirstDayOfMonth(year, month);
+            const monthName = calendarDate.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+
+            let calendarHTML = `
+                <div>
+                    <div class="flex-between mb-4">
+                        <div>
+                            <h1 class="font-display gold-text" style="font-size: 28px; font-weight: bold;">PAYMENT VAULT</h1>
+                            <p class="font-vault text-sm" style="color: var(--stone);">Track and manage your recurring payments</p>
+                        </div>
+                        <button class="vault-btn" onclick="openAddPaymentModal()">+ Add Payment</button>
+                    </div>
+
+                    <div class="vault-panel">
+                        <div class="flex-between mb-4">
+                            <button class="vault-btn-outline" onclick="changeMonth(-1)">◀</button>
+                            <h2 class="font-display gold-text" style="font-size: 20px; font-weight: bold;">${monthName}</h2>
+                            <button class="vault-btn-outline" onclick="changeMonth(1)">▶</button>
+                        </div>
+
+                        <div class="calendar-grid" style="margin-bottom: 8px;">
+                            ${['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map(d => 
+                                `<div style="text-align: center; color: var(--stone); font-size: 11px; text-transform: uppercase; padding: 8px;">${d}</div>`
+                            ).join('')}
+                        </div>
+
+                        <div class="calendar-grid" id="calendar-days">
+            `;
+
+            // Empty cells
+            for (let i = 0; i < firstDay; i++) {
+                calendarHTML += '<div></div>';
+            }
+
+            // Days
+            const today = todayISO();
+            for (let day = 1; day <= daysInMonth; day++) {
+                const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                const isToday = dateStr === today;
+                const payments = appState.payments.filter(p => {
+                    if (!p.nextDue) return false;
+                    const dueDate = p.nextDue;
+                    return dueDate === dateStr;
+                });
+
+                calendarHTML += `
+                    <button class="calendar-day ${isToday ? 'today' : ''}" onclick="selectDay('${dateStr}')">
+                        ${day}
+                        ${payments.length > 0 ? `<div style="position: absolute; bottom: 4px; left: 50%; transform: translateX(-50%); width: 6px; height: 6px; background: var(--gold); border-radius: 50%;"></div>` : ''}
+                    </button>
+                `;
+            }
+
+            calendarHTML += `
+                        </div>
+                    </div>
+
+                    <div id="selected-day-details"></div>
+
+                    <div class="vault-panel">
+                        <h2 class="font-display gold-text mb-4" style="font-size: 18px; font-weight: bold;">All Scheduled Payments</h2>
+                        ${appState.payments.length === 0 ? '<p class="text-sm" style="color: var(--stone);">No payments scheduled</p>' :
+                            `<div class="space-y-3">
+                                ${appState.payments.map(p => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px; background: var(--bg-dark); border-radius: 4px;">
+                                        <div style="flex: 1;">
+                                            <div class="font-vault gold-text">${p.title}</div>
+                                            <div class="text-xs" style="color: var(--stone);">${p.category} • Due: ${formatDate(p.nextDue)}</div>
+                                        </div>
+                                        <div style="display: flex; gap: 12px; align-items: center;">
+                                            <span class="font-vault gold-text" style="font-weight: bold;">${formatCurrency(Number(p.amount))}</span>
+                                            ${!p.paid ? `<button onclick="markPaid('${p.id}')" style="color: var(--green); background: none; border: none; cursor: pointer;">✓</button>` : ''}
+                                            <button onclick="openEditPaymentModal('${p.id}')" class="vault-btn-outline" style="padding: 4px 8px; font-size: 12px;">Edit</button>
+                                            <button onclick="deletePayment('${p.id}')" style="color: var(--red); background: none; border: none; cursor: pointer;">🗑</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>`
+                        }
+                    </div>
+                </div>
+            `;
+
+            return calendarHTML;
+        }
+
+        function initCalendar() {
+            // Calendar is already rendered in renderCalendar()
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderVault('calendar');
+        }
+
+        function selectDay(dateStr) {
+            const payments = appState.payments.filter(p => p.nextDue === dateStr);
+            const container = document.getElementById('selected-day-details');
+            
+            if (payments.length === 0) {
+                container.innerHTML = `
+                    <div class="vault-panel mt-2">
+                        <h3 class="font-display gold-text mb-4" style="font-size: 18px; font-weight: bold;">${formatDate(dateStr)}</h3>
+                        <p class="text-sm" style="color: var(--stone);">No payments scheduled for this day</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="vault-panel mt-2">
+                        <h3 class="font-display gold-text mb-4" style="font-size: 18px; font-weight: bold;">${formatDate(dateStr)}</h3>
+                        <div class="space-y-3">
+                            ${payments.map(p => `
+                                <div style="display: flex; justify-content: space-between; padding: 12px; background: var(--bg-dark); border-radius: 4px;">
+                                    <div>
+                                        <div class="font-vault gold-text">${p.title}</div>
+                                        <div class="text-xs" style="color: var(--stone);">${p.category}</div>
+                                    </div>
+                                    <div class="font-vault gold-text" style="font-weight: bold;">${formatCurrency(Number(p.amount))}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function openAddPaymentModal() {
+            openPaymentModal();
+        }
+
+        function openEditPaymentModal(id) {
+            const payment = appState.payments.find(p => p.id === id);
+            if (payment) openPaymentModal(payment);
+        }
+
+        function openPaymentModal(payment = null) {
+            const isEdit = payment !== null;
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.id = 'payment-modal';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="flex-between mb-4">
+                        <h2 class="font-display gold-text" style="font-size: 20px; font-weight: bold;">${isEdit ? 'Edit' : 'Add'} Payment</h2>
+                        <button onclick="document.getElementById('payment-modal').remove()" style="background: none; border: none; color: var(--stone); cursor: pointer; font-size: 24px;">×</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="vault-label">Title</label>
+                            <input type="text" id="pay-title" class="vault-input" value="${isEdit ? payment.title : ''}" placeholder="Rent, Netflix, etc.">
+                        </div>
+                        <div>
+                            <label class="vault-label">Amount</label>
+                            <input type="number" id="pay-amount" class="vault-input" value="${isEdit ? payment.amount : ''}" placeholder="0.00" step="0.01">
+                        </div>
+                        <div>
+                            <label class="vault-label">Due Day (1-31)</label>
+                            <input type="number" id="pay-day" class="vault-input" value="${isEdit ? payment.dueDay : ''}" placeholder="15" min="1" max="31">
+                        </div>
+                        <div>
+                            <label class="vault-label">Category</label>
+                            <select id="pay-category" class="vault-select">
+                                <option ${isEdit && payment.category === 'Housing' ? 'selected' : ''}>Housing</option>
+                                <option ${isEdit && payment.category === 'Bills' ? 'selected' : ''}>Bills</option>
+                                <option ${isEdit && payment.category === 'Insurance' ? 'selected' : ''}>Insurance</option>
+                                <option ${isEdit && payment.category === 'Entertainment' ? 'selected' : ''}>Entertainment</option>
+                                <option ${isEdit && payment.category === 'Subscriptions' ? 'selected' : ''}>Subscriptions</option>
+                                <option ${isEdit && payment.category === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <button class="vault-btn w-full mt-2" onclick="savePayment(${isEdit ? `'${payment.id}'` : 'null'})">
+                            ${isEdit ? 'Update' : 'Add'} Payment
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function savePayment(editId) {
+            const title = document.getElementById('pay-title').value;
+            const amount = parseFloat(document.getElementById('pay-amount').value);
+            const dueDay = parseInt(document.getElementById('pay-day').value);
+            const category = document.getElementById('pay-category').value;
+
+            if (!title || !amount || !dueDay) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+
+            if (editId) {
+                const idx = appState.payments.findIndex(p => p.id === editId);
+                if (idx !== -1) {
+                    appState.payments[idx] = { ...appState.payments[idx], title, amount, dueDay, category };
+                    showToast('Payment updated successfully', 'success');
+                }
+            } else {
+                const today = new Date();
+                const nextDue = new Date(today.getFullYear(), today.getMonth(), dueDay);
+                if (nextDue < today) nextDue.setMonth(nextDue.getMonth() + 1);
+
+                appState.payments.push({
+                    id: generateId(),
+                    title,
+                    amount,
+                    dueDay,
+                    category,
+                    recurring: true,
+                    nextDue: nextDue.toISOString().split('T')[0],
+                    reminderDays: 3,
+                    paid: false,
+                });
+                showToast('Payment added successfully', 'success');
+            }
+
+            saveState(appState);
+            document.getElementById('payment-modal').remove();
+            renderVault('calendar');
+            updateHUD();
+        }
+
+        function deletePayment(id) {
+            appState.payments = appState.payments.filter(p => p.id !== id);
+            saveState(appState);
+            renderVault('calendar');
+            showToast('Payment deleted', 'info');
+        }
+
+        function markPaid(id) {
+            const payment = appState.payments.find(p => p.id === id);
+            if (payment) {
+                if (payment.recurring) {
+                    const nextDue = new Date(payment.nextDue);
+                    nextDue.setMonth(nextDue.getMonth() + 1);
+                    payment.nextDue = nextDue.toISOString().split('T')[0];
+                } else {
+                    payment.paid = true;
+                }
+                saveState(appState);
+                renderVault('calendar');
+                showToast('Payment marked as paid!', 'success');
+            }
+        }
+
+        // ==================== LEDGER ====================
+        let ledgerFilter = 'all';
+        let searchTerm = '';
+
+        function renderLedger() {
+            let filtered = appState.transactions;
+            if (ledgerFilter !== 'all') filtered = filtered.filter(t => t.type === ledgerFilter);
+            if (searchTerm) {
+                const search = searchTerm.toLowerCase();
+                filtered = filtered.filter(t => t.description.toLowerCase().includes(search) || t.category.toLowerCase().includes(search));
+            }
+
+            const totalIncome = appState.transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + Number(t.amount), 0);
+            const totalExpenses = appState.transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + Number(t.amount), 0);
+            const net = totalIncome - totalExpenses;
+
+            return `
+                <div>
+                    <div class="flex-between mb-4">
+                        <div>
+                            <h1 class="font-display gold-text" style="font-size: 28px; font-weight: bold;">LEDGER VAULT</h1>
+                            <p class="font-vault text-sm" style="color: var(--stone);">Track every coin that flows in and out</p>
+                        </div>
+                        <button class="vault-btn" onclick="openAddTransactionModal()">+ Add Transaction</button>
+                    </div>
+
+                    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Income</div>
+                            <div class="font-vault" style="font-size: 20px; font-weight: bold; color: var(--green);">${formatCurrency(totalIncome)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Expenses</div>
+                            <div class="font-vault" style="font-size: 20px; font-weight: bold; color: var(--red);">${formatCurrency(totalExpenses)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Net</div>
+                            <div class="font-vault" style="font-size: 20px; font-weight: bold; color: ${net >= 0 ? 'var(--green)' : 'var(--red)'};">${formatCurrency(net)}</div>
+                        </div>
+                    </div>
+
+                    <div class="vault-panel">
+                        <div style="display: flex; gap: 16px; align-items: center;">
+                            <input type="text" class="vault-input" placeholder="Search transactions..." value="${searchTerm}" onchange="searchTransactions(this.value)" style="flex: 1;">
+                            <button class="vault-btn-outline ${ledgerFilter === 'all' ? 'active' : ''}" onclick="filterLedger('all')">All</button>
+                            <button class="vault-btn-outline ${ledgerFilter === 'income' ? 'active' : ''}" onclick="filterLedger('income')">Income</button>
+                            <button class="vault-btn-outline ${ledgerFilter === 'expense' ? 'active' : ''}" onclick="filterLedger('expense')">Expenses</button>
+                        </div>
+                    </div>
+
+                    <div class="vault-panel">
+                        ${filtered.length === 0 ? '<p class="text-center text-sm" style="color: var(--stone);">No transactions found</p>' :
+                            `<div class="space-y-3">
+                                ${filtered.map(t => `
+                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 16px; background: var(--bg-dark); border-radius: 4px; border-left: 3px solid ${t.type === 'income' ? 'var(--green)' : 'var(--red)'};">
+                                        <div style="flex: 1;">
+                                            <div class="font-vault gold-text">${t.description}</div>
+                                            <div class="text-xs" style="color: var(--stone);">${t.category} • ${formatDate(t.date)}</div>
+                                        </div>
+                                        <div style="display: flex; gap: 16px; align-items: center;">
+                                            <span class="font-vault" style="font-weight: bold; color: ${t.type === 'income' ? 'var(--green)' : 'var(--red)'};">
+                                                ${t.type === 'income' ? '+' : '-'}${formatCurrency(Number(t.amount))}
+                                            </span>
+                                            <button onclick="openEditTransactionModal('${t.id}')" style="color: var(--stone); background: none; border: none; cursor: pointer;">✏️</button>
+                                            <button onclick="deleteTransaction('${t.id}')" style="color: var(--red); background: none; border: none; cursor: pointer;">🗑</button>
+                                        </div>
+                                    </div>
+                                `).join('')}
+                            </div>`
+                        }
+                    </div>
+                </div>
+            `;
+        }
+
+        function searchTransactions(value) {
+            searchTerm = value;
+            renderVault('ledger');
+        }
+
+        function filterLedger(filter) {
+            ledgerFilter = filter;
+            renderVault('ledger');
+        }
+
+        function openAddTransactionModal() {
+            openTransactionModal();
+        }
+
+        function openEditTransactionModal(id) {
+            const tx = appState.transactions.find(t => t.id === id);
+            if (tx) openTransactionModal(tx);
+        }
+
+        function openTransactionModal(tx = null) {
+            const isEdit = tx !== null;
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.id = 'transaction-modal';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="flex-between mb-4">
+                        <h2 class="font-display gold-text" style="font-size: 20px; font-weight: bold;">${isEdit ? 'Edit' : 'Add'} Transaction</h2>
+                        <button onclick="document.getElementById('transaction-modal').remove()" style="background: none; border: none; color: var(--stone); cursor: pointer; font-size: 24px;">×</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="vault-label">Type</label>
+                            <select id="tx-type" class="vault-select">
+                                <option ${isEdit && tx.type === 'income' ? 'selected' : ''}>income</option>
+                                <option ${isEdit && tx.type === 'expense' ? 'selected' : ''}>expense</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="vault-label">Amount</label>
+                            <input type="number" id="tx-amount" class="vault-input" value="${isEdit ? tx.amount : ''}" placeholder="0.00" step="0.01">
+                        </div>
+                        <div>
+                            <label class="vault-label">Description</label>
+                            <input type="text" id="tx-desc" class="vault-input" value="${isEdit ? tx.description : ''}" placeholder="Groceries, Salary, etc.">
+                        </div>
+                        <div>
+                            <label class="vault-label">Category</label>
+                            <select id="tx-category" class="vault-select">
+                                <option ${isEdit && tx.category === 'Salary' ? 'selected' : ''}>Salary</option>
+                                <option ${isEdit && tx.category === 'Food' ? 'selected' : ''}>Food</option>
+                                <option ${isEdit && tx.category === 'Groceries' ? 'selected' : ''}>Groceries</option>
+                                <option ${isEdit && tx.category === 'Rent' ? 'selected' : ''}>Rent</option>
+                                <option ${isEdit && tx.category === 'Utilities' ? 'selected' : ''}>Utilities</option>
+                                <option ${isEdit && tx.category === 'Entertainment' ? 'selected' : ''}>Entertainment</option>
+                                <option ${isEdit && tx.category === 'Shopping' ? 'selected' : ''}>Shopping</option>
+                                <option ${isEdit && tx.category === 'Other' ? 'selected' : ''}>Other</option>
+                            </select>
+                        </div>
+                        <button class="vault-btn w-full mt-2" onclick="saveTransaction(${isEdit ? `'${tx.id}'` : 'null'})">
+                            ${isEdit ? 'Update' : 'Add'} Transaction
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function saveTransaction(editId) {
+            const type = document.getElementById('tx-type').value;
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const description = document.getElementById('tx-desc').value;
+            const category = document.getElementById('tx-category').value;
+
+            if (!amount || !description) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+
+            if (editId) {
+                const idx = appState.transactions.findIndex(t => t.id === editId);
+                if (idx !== -1) {
+                    appState.transactions[idx] = { ...appState.transactions[idx], type, amount, description, category, date: todayISO() };
+                    showToast('Transaction updated successfully', 'success');
+                }
+            } else {
+                appState.transactions.push({
+                    id: generateId(),
+                    type,
+                    amount,
+                    description,
+                    category,
+                    date: todayISO(),
+                });
+                showToast('Transaction added successfully', 'success');
+            }
+
+            saveState(appState);
+            document.getElementById('transaction-modal').remove();
+            renderVault('ledger');
+            updateHUD();
+        }
+
+        function deleteTransaction(id) {
+            appState.transactions = appState.transactions.filter(t => t.id !== id);
+            saveState(appState);
+            renderVault('ledger');
+            showToast('Transaction deleted', 'info');
+        }
+
+        // ==================== SAVINGS ====================
+        function renderSavings() {
+            const totalSaved = appState.goals.reduce((sum, g) => sum + Number(g.savedAmount), 0);
+            const totalTarget = appState.goals.reduce((sum, g) => sum + Number(g.targetAmount), 0);
+            const completed = appState.goals.filter(g => Number(g.savedAmount) >= Number(g.targetAmount)).length;
+
+            return `
+                <div>
+                    <div class="flex-between mb-4">
+                        <div>
+                            <h1 class="font-display gold-text" style="font-size: 28px; font-weight: bold;">SAVINGS VAULT</h1>
+                            <p class="font-vault text-sm" style="color: var(--stone);">Build your treasure one coin at a time</p>
+                        </div>
+                        <button class="vault-btn" onclick="openAddGoalModal()">+ New Goal</button>
+                    </div>
+
+                    <div class="stats-grid" style="grid-template-columns: repeat(3, 1fr);">
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Total Saved</div>
+                            <div class="font-vault gold-text" style="font-size: 20px; font-weight: bold;">${formatCurrency(totalSaved)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Total Target</div>
+                            <div class="font-vault" style="font-size: 20px; font-weight: bold; color: var(--gold-light);">${formatCurrency(totalTarget)}</div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="color: var(--stone); font-size: 11px; text-transform: uppercase; margin-bottom: 4px;">Completed</div>
+                            <div class="font-vault" style="font-size: 20px; font-weight: bold; color: var(--green);">${completed}/${appState.goals.length}</div>
+                        </div>
+                    </div>
+
+                    ${appState.goals.length === 0 ?
+                        `<div class="vault-panel text-center">
+                            <p class="text-sm" style="color: var(--stone); margin-bottom: 16px;">No savings goals yet</p>
+                            <button class="vault-btn" onclick="openAddGoalModal()">Create Your First Goal</button>
+                        </div>` :
+                        `<div class="grid-2">
+                            ${appState.goals.map(g => {
+                                const progress = Math.min((Number(g.savedAmount) / Number(g.targetAmount)) * 100, 100);
+                                const isComplete = Number(g.savedAmount) >= Number(g.targetAmount);
+                                return `
+                                    <div class="vault-panel" style="${isComplete ? 'border: 2px solid var(--green);' : ''}">
+                                        <div class="flex-between mb-4">
+                                            <div style="display: flex; align-items: center; gap: 12px;">
+                                                <span style="font-size: 40px;">${g.icon}</span>
+                                                <div>
+                                                    <h3 class="font-display gold-text" style="font-size: 18px; font-weight: bold;">${g.name}</h3>
+                                                    ${isComplete ? '<span class="text-xs" style="color: var(--green);">✓ COMPLETED</span>' : ''}
+                                                </div>
+                                            </div>
+                                            <div>
+                                                <button onclick="openEditGoalModal('${g.id}')" style="color: var(--stone); background: none; border: none; cursor: pointer; margin-right: 8px;">✏️</button>
+                                                <button onclick="deleteGoal('${g.id}')" style="color: var(--red); background: none; border: none; cursor: pointer;">🗑</button>
+                                            </div>
+                                        </div>
+                                        <div class="progress-track mb-2">
+                                            <div class="progress-fill" style="width: ${progress}%; background: ${isComplete ? 'var(--green)' : g.color};"></div>
+                                        </div>
+                                        <div class="flex-between text-xs mb-4" style="color: var(--stone);">
+                                            <span>${formatCurrency(Number(g.savedAmount))}</span>
+                                            <span>${formatCurrency(Number(g.targetAmount))}</span>
+                                        </div>
+                                        <div class="text-center mb-4">
+                                            <span class="font-vault gold-text" style="font-size: 24px; font-weight: bold;">${progress.toFixed(1)}%</span>
+                                        </div>
+                                        ${!isComplete ? `<button class="vault-btn w-full" onclick="openDepositModal('${g.id}')">💰 Deposit Funds</button>` : ''}
+                                    </div>
+                                `;
+                            }).join('')}
+                        </div>`
+                    }
+                </div>
+            `;
+        }
+
+        function openAddGoalModal() {
+            openGoalModal();
+        }
+
+        function openEditGoalModal(id) {
+            const goal = appState.goals.find(g => g.id === id);
+            if (goal) openGoalModal(goal);
+        }
+
+        function openGoalModal(goal = null) {
+            const isEdit = goal !== null;
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.id = 'goal-modal';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="flex-between mb-4">
+                        <h2 class="font-display gold-text" style="font-size: 20px; font-weight: bold;">${isEdit ? 'Edit' : 'New'} Goal</h2>
+                        <button onclick="document.getElementById('goal-modal').remove()" style="background: none; border: none; color: var(--stone); cursor: pointer; font-size: 24px;">×</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="vault-label">Goal Name</label>
+                            <input type="text" id="goal-name" class="vault-input" value="${isEdit ? goal.name : ''}" placeholder="Emergency Fund, New Car, etc.">
+                        </div>
+                        <div>
+                            <label class="vault-label">Target Amount</label>
+                            <input type="number" id="goal-target" class="vault-input" value="${isEdit ? goal.targetAmount : ''}" placeholder="5000" step="100">
+                        </div>
+                        <div>
+                            <label class="vault-label">Icon (emoji)</label>
+                            <input type="text" id="goal-icon" class="vault-input" value="${isEdit ? goal.icon : '💰'}" placeholder="💰">
+                        </div>
+                        <div>
+                            <label class="vault-label">Color</label>
+                            <input type="color" id="goal-color" class="w-full" value="${isEdit ? goal.color : '#c9a227'}">
+                        </div>
+                        <button class="vault-btn w-full mt-2" onclick="saveGoal(${isEdit ? `'${goal.id}'` : 'null'})">
+                            ${isEdit ? 'Update' : 'Create'} Goal
+                        </button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function saveGoal(editId) {
+            const name = document.getElementById('goal-name').value;
+            const targetAmount = parseFloat(document.getElementById('goal-target').value);
+            const icon = document.getElementById('goal-icon').value;
+            const color = document.getElementById('goal-color').value;
+
+            if (!name || !targetAmount) {
+                showToast('Please fill in all required fields', 'warning');
+                return;
+            }
+
+            if (editId) {
+                const idx = appState.goals.findIndex(g => g.id === editId);
+                if (idx !== -1) {
+                    appState.goals[idx] = { ...appState.goals[idx], name, targetAmount, icon, color };
+                    showToast('Goal updated successfully', 'success');
+                }
+            } else {
+                appState.goals.push({
+                    id: generateId(),
+                    name,
+                    targetAmount,
+                    savedAmount: 0,
+                    icon,
+                    color,
+                });
+                showToast('Goal created successfully', 'success');
+            }
+
+            saveState(appState);
+            document.getElementById('goal-modal').remove();
+            renderVault('savings');
+        }
+
+        function deleteGoal(id) {
+            appState.goals = appState.goals.filter(g => g.id !== id);
+            saveState(appState);
+            renderVault('savings');
+            showToast('Goal deleted', 'info');
+        }
+
+        function openDepositModal(id) {
+            const goal = appState.goals.find(g => g.id === id);
+            if (!goal) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-backdrop';
+            modal.id = 'deposit-modal';
+            modal.onclick = (e) => { if (e.target === modal) modal.remove(); };
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="flex-between mb-4">
+                        <h2 class="font-display gold-text" style="font-size: 20px; font-weight: bold;">Deposit to ${goal.name}</h2>
+                        <button onclick="document.getElementById('deposit-modal').remove()" style="background: none; border: none; color: var(--stone); cursor: pointer; font-size: 24px;">×</button>
+                    </div>
+                    <div class="space-y-3">
+                        <div>
+                            <label class="vault-label">Amount to Deposit</label>
+                            <input type="number" id="deposit-amount" class="vault-input" placeholder="100" step="10" autofocus>
+                        </div>
+                        <div class="vault-panel" style="background: var(--bg-dark); padding: 12px;">
+                            <div class="text-xs mb-2" style="color: var(--stone);">Current Progress</div>
+                            <div class="font-vault gold-text">${formatCurrency(Number(goal.savedAmount))} / ${formatCurrency(Number(goal.targetAmount))}</div>
+                        </div>
+                        <button class="vault-btn w-full mt-2" onclick="saveDeposit('${goal.id}')">Deposit</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+        }
+
+        function saveDeposit(id) {
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            if (!amount || amount <= 0) {
+                showToast('Please enter a valid amount', 'warning');
+                return;
+            }
+
+            const idx = appState.goals.findIndex(g => g.id === id);
+            if (idx !== -1) {
+                const oldSaved = Number(appState.goals[idx].savedAmount);
+                appState.goals[idx].savedAmount = Math.min(oldSaved + amount, Number(appState.goals[idx].targetAmount));
+                
+                if (appState.goals[idx].savedAmount >= Number(appState.goals[idx].targetAmount)) {
+                    showToast('🎉 Goal completed!', 'success');
+                } else {
+                    showToast(`Deposited ${formatCurrency(amount)} successfully`, 'success');
+                }
+
+                saveState(appState);
+                document.getElementById('deposit-modal').remove();
+                renderVault('savings');
+            }
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            updateHUD();
+            renderVault('dashboard');
+        });
+    </script>
+</body>
+</html>
